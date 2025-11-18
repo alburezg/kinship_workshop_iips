@@ -12,4 +12,4 @@ Diego Alburez-Gutierrez<sup>1</sup> & Saroja Adhikari<sup>1</sup>
 
 Max Planck Institute for Demographic Research
 
-**To deploy, visit: https://github.com/alburezg/kinship_workshop_iips**
+**To deploy, visit: http://alburez.me/kinship_workshop_iips/**
