@@ -857,6 +857,84 @@ We pre-processed the data for this workshop:
 ```{r eval=TRUE, message=FALSE, warning=FALSE, include=TRUE}
 load("data/india_edu.rdata")
 ```
+#### 3.1 Input data 
+Before running the model, let’s examine some trends in the data:
+```{r, message=FALSE, warning=FALSE}
+# Calculate and plot Total Fertility Rate by education level over time
+tfr_data <- lapply(seq_along(F_mat_fem_edu), function(i) {
+  col_sums <- colSums(F_mat_fem_edu[[i]])
+  data.frame(
+    year = 2020 + (i - 1) * 5,
+    education = factor(colnames(F_mat_fem_edu[[i]]), 
+                      levels = c("e1", "e2", "e3", "e4", "e5", "e6"),
+                      labels = c("no education", "incomplete primary", 
+                                "primary", "lower secondary", 
+                                "upper secondary", "post-secondary")),
+    tfr = col_sums
+  )
+})
+
+tfr_df <- do.call(rbind, tfr_data)
+
+# Plot TFR trends
+ggplot(tfr_df%>%filter(year<2095), aes(x = year, y = tfr, color = education, group = education)) +
+  geom_line(size = 1) +
+  geom_point() +
+  theme_minimal() +
+  labs(
+    title = "Total Fertility Rate by Education Over Time",
+    x = "Year",
+    y = "TFR",
+    color = "Education"
+  )
+
+```
+Because expert-based assumptions were applied to fertility in 2050, the projected trend shows a discontinuity, especially for lower education. Details about assumption is given in 
+https://pure.iiasa.ac.at/id/eprint/19487/
+
+
+Let's look at survival ratio
+```{r, message=FALSE, warning=FALSE}
+# Calculate and plot survival ratio for female by education level over time
+surv_data <- lapply(seq_along(U_mat_fem_edu), function(i) {
+#extract survival ratio for ith year
+  survdt <- U_mat_fem_edu[[i]]
+
+  data.frame(
+    year = 2020 + (i - 1) * 5,
+    age  = as.numeric(rownames(survdt)),
+    education = rep(
+      factor(colnames(survdt),
+             levels = c("e1","e2","e3","e4","e5","e6"),
+             labels = c("no education","incomplete primary","primary",
+                        "lower secondary","upper secondary","post-secondary")),
+      each = nrow(survdt)
+    ),
+    survival = as.vector(survdt)
+  )
+})
+
+surv_df <- do.call(rbind, surv_data)
+
+# Plot Survival ratio trends
+ggplot(surv_df %>% 
+         filter(age %in% c(0,15, 40,65)),
+       aes(x = year, y = survival, color = education, group = education)) +
+  geom_line(size = 1) +
+  geom_point() +
+  theme_minimal() +
+  facet_wrap(~age) +
+  labs(
+    title = "Survival Ratio by Education",
+    x = "Year",
+    y = "Survival Ratio",
+    color = "Education"
+  )
+
+```
+
+Because the COVID-19 pandemic reduced survival ratios in 2020, we observe pronounced recovery in 2025.
+Education differential in mortality is only applied from the age 15 in Input data.
 
 ### 4. Run multistate kinship model
 
@@ -991,7 +1069,7 @@ kin_out_2020_2090$kin_full %>%
   ggplot2::ggplot(ggplot2::aes(x = age_kin, y = count, color = stage_kin, fill = stage_kin)) +
   ggplot2::geom_bar(position = "stack", stat = "identity") +
   ggplot2::scale_x_continuous(breaks = c(0,10,20,30,40,50,60,70,80,90,100)) +
-  labs(x  ="Age of kin for a 65 yo woman born in 2020") +
+  labs(x  ="Age of kin for a 60 yo woman born in 2020") +
   ggplot2::facet_wrap(. ~ kin_label) +
   ggplot2::theme_bw() +
   ggplot2::theme(
@@ -1047,8 +1125,45 @@ We note that there are following simplifying assumptions due to data limitations
 
 1. Fertility rates vary over time and by education level but are identical for both sexes (the androgynous approximation).
 2. Age-specific education transition probabilities vary over time but not by sex (also an androgynous approximation).
-3. Since no transition data exist beyond age 10, we assume that at ages 0-4, individuals transition from no education to incomplete primary in the next 5-year interval, and at ages 5-9, they transition from incomplete primary to primary (based on India's Compulsory Education Act 2009).
+3. Since no transition data exist beyond age 10, we assume that at ages 0-4, individuals transition from no education to incomplete primary in the next 5-year interval, and at ages 5-9, they transition from incomplete primary to primary (based on India's Compulsory Education Act 2009). (everyone above age 10 will thus have at least primary education)
 4. Demographic rates remain stable (time-invariant) before 2020, the earliest observed data point.
+
+### 6.Exercise 
+##### 6.1 Educatuion compositionfo of selected kin over the life course of Focal 
+E1.1 For a newborn in 2020, how many grandmothers and grandfathers with at least a primary education are they expected to have ? 
+
+E1.2 How does this number change when focal grow older? 
+
+E1.3 what patterns did you observe?  Also, compare this result with the Focal born in 2050.
+
+
+```{r, include=FALSE}
+# Write your code here
+
+```
+
+##### 6.2 Transitions in education and fertility across time
+E2.1 In which year can a woman born in 2020 expect to have at least half of her children attain at least a secondary level of education? 
+
+E2.2 What does the shape of the curves tell us about the demographic processes behind  fertility timing and education progression?  
+
+```{r, include=FALSE}
+# Write your code here
+
+```
+
+##### 6.3 Education composition over age and time
+E3.1 Compare the educational composition of children in 2020, 2050, and 2080 for a women of age 65. What trends do you observe in the number of primary vs. secondary educated children over time? 
+
+E3.2 At what ages do children with upper secondary & above level of education tend to appear in each year? What does this suggest about educational progression across cohorts?
+
+```{r, include=FALSE}
+# Write your code here
+
+
+```
+
+
 
 ## Appendix: Other countries
 
@@ -1148,4 +1263,6 @@ write.csv(pop_male, "data/npl_popmale.csv", row.names = F)
 Now we have all the input data needed to run the 2-sex time-variant model (see "1. Setup" in Part 2). We can simply repeat the analysis in Part 2 (starting from "2. Run kinship model") and get the kin estimates for Nepal.
 
 ## References
+
+
 
