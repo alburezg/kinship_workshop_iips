@@ -1129,7 +1129,7 @@ We note that there are following simplifying assumptions due to data limitations
 4. Demographic rates remain stable (time-invariant) before 2020, the earliest observed data point.
 
 ### 6.Exercise 
-##### 6.1 Educatuion compositionfo of selected kin over the life course of Focal
+##### 6.1 Educatuion compositionfo of selected kin over the life course of Focal 
 E1.1 For a newborn in 2020, how many grandmothers and grandfathers with at least a primary education are they expected to have ? 
 
 E1.2 How does this number change when focal grow older? 
@@ -1263,5 +1263,6 @@ write.csv(pop_male, "data/npl_popmale.csv", row.names = F)
 Now we have all the input data needed to run the 2-sex time-variant model (see "1. Setup" in Part 2). We can simply repeat the analysis in Part 2 (starting from "2. Run kinship model") and get the kin estimates for Nepal.
 
 ## References
+
 
 
