@@ -858,7 +858,11 @@ We pre-processed the data for this workshop:
 load("data/india_edu.rdata")
 ```
 #### 3.1 Input data 
+
 Before running the model, let’s examine some trends in the data:
+
+#### 3.1.1 Fertility rates 
+
 ```{r, message=FALSE, warning=FALSE}
 # Calculate and plot Total Fertility Rate by education level over time
 tfr_data <- lapply(seq_along(F_mat_fem_edu), function(i) {
@@ -880,18 +884,19 @@ tfr_df <- do.call(rbind, tfr_data)
 ggplot(tfr_df%>%filter(year<2095), aes(x = year, y = tfr, color = education, group = education)) +
   geom_line(size = 1) +
   geom_point() +
-  theme_minimal() +
-  labs(
-    title = "Total Fertility Rate by Education Over Time",
+  theme_bw() +theme(legend.position = "bottom")+
+
+  labs(title = "Total fertility rate by education over time",
     x = "Year",
     y = "TFR",
     color = "Education"
   )
 
 ```
-Because expert-based assumptions were applied to fertility in 2050, the projected trend shows a discontinuity, especially for lower education. Details about assumption is given in 
-https://pure.iiasa.ac.at/id/eprint/19487/
+Because expert-based assumptions were applied to fertility in 2050, the projected trend shows a discontinuity, especially for lower education. Details about assumption is given in https://pure.iiasa.ac.at/id/eprint/19487/
 
+
+#### 3.1.2 Survival rates
 
 Let's look at survival ratio
 ```{r, message=FALSE, warning=FALSE}
@@ -922,19 +927,83 @@ ggplot(surv_df %>%
        aes(x = year, y = survival, color = education, group = education)) +
   geom_line(size = 1) +
   geom_point() +
-  theme_minimal() +
+  theme_bw() + theme(legend.position = "bottom")+
   facet_wrap(~age) +
-  labs(
-    title = "Survival Ratio by Education",
+  labs(title = "Survival ratio by education",
     x = "Year",
-    y = "Survival Ratio",
+    y = "Survival ratio",
     color = "Education"
   )
 
 ```
 
 Because the COVID-19 pandemic reduced survival ratios in 2020, we observe pronounced recovery in 2025.
-Education differential in mortality is only applied from the age 15 in Input data.
+Education differential in mortality is only applied from the age 15 in input data.
+
+#### 3.1.3 Education transition rates 
+
+Now let's plot education transition probabilities
+
+Education transition probability= Probability that a person moves from one level of education to another (only higher level or only upward transition)level of education as they age.
+
+```{r, message=FALSE, warning=FALSE}
+
+# Education labels
+edu_labels <- c("e1","e2","e3","e4","e5","e6")
+edu_names  <- c("no education","incomplete primary","primary",
+                "lower secondary","upper secondary","post-secondary")
+
+trans_df <- lapply(seq_along(T_mat_fem_edu), function(i) {
+  
+  year_val <- 2020 + (i - 1) * 5
+  
+  lapply(seq_along(T_mat_fem_edu[[i]]), function(a) {
+    mat <- T_mat_fem_edu[[i]][[a]]
+    
+    expand.grid(
+      to_stage   = 1:6,   # <-- rows
+      from_stage = 1:6    # <-- columns
+    ) %>%
+      mutate(
+        transition_prob = as.vector(mat),     
+        age  = 0+ (a - 1) * 5,
+        year = year_val,
+        cohort=year-age,
+        from_stage = factor(from_stage, levels = 1:6, labels = edu_labels),
+        to_stage   = factor(to_stage,   levels = 1:6, labels = edu_labels),
+        from_name  = factor(from_stage, labels = edu_names),
+        to_name    = factor(to_stage,   labels = edu_names)
+      )
+  }) %>% bind_rows()
+  
+}) %>% bind_rows()
+
+
+# Education transition plot ages 10-15 and 15-20 and 20-25
+ggplot(trans_df%>%filter(age%in%c(10,15,20) & cohort<2065),aes(x = year, y = transition_prob, fill = to_name))+
+    geom_area() +
+    facet_grid(age ~ from_name) +
+    labs(
+      title = "Education transition probabilities for female by age in India",
+      x = "Year",
+      y = "Transition probability",
+      fill = "Destination education"
+    ) +
+    theme_bw()+theme(axis.text.x = element_text(angle = 90),legend.position = "bottom") 
+
+
+``` 
+Over time, the probability of transitioning from lower to higher education levels is expected to increase.
+
+
+Assumptions of education transition probabilities from Wittgenstein Center:
+ 
+1.Individuals younger than 10 are still in basic schooling and are not included in the model. Therefore, education transitions are considered only from age 10 onward.
+
+2.People are assumed to complete their education by age 30, meaning no further transitions occur after that age.
+
+3.Education transitions depend on age. For example, a person who is 20 years old and at the primary level will not move to lower secondary. However, if someone at the same age is in upper secondary, they will have a probability of moving to post-secondary education.
+
 
 ### 4. Run multistate kinship model
 
@@ -1011,7 +1080,7 @@ Notice the structure of the output data `kin_summary`. We have columns `age_foca
 Let's take a look at `kin_summary` by selecting 10 rows, from row 1000 to row 1010. 
 
 ```{r, message=FALSE, warning=FALSE}
-kin_out_2020_2090$kin_summary[1000:1020, ]
+kin_out_2020_2090$kin_summary[1000:1010, ]
 ```
 
 #### 5.1. Cohort approach
@@ -1055,7 +1124,7 @@ kin_out_2020_2090$kin_summary %>%
   theme(legend.position = "bottom")
 ```
 
-Next, we see the age distribution of kin (by education of kin) for a 60 yo woman born in the year 2020:
+Next, we see the age distribution of kin (by education of kin) for a 60 year old woman born in the year 2020:
 
 ```{r}
 kin_out_2020_2090$kin_full %>%
@@ -1080,7 +1149,7 @@ kin_out_2020_2090$kin_full %>%
 
 #### 5.2. Period approach
 
-Let's see the expected number of living children and grandchildren for a 60 yo woman over time by the level of educational attainment of the children and grandchildren:
+Let's see the expected number of living children and grandchildren for a 60 year old woman over time by the level of educational attainment of the children and grandchildren:
 
 ```{r, fig.height=6, fig.width=8}
 kin_out_2020_2090$kin_summary %>%
@@ -1120,16 +1189,14 @@ kin_out_2020_2090$kin_summary %>%
     theme(legend.position = "bottom")
 ```
 
-
 We note that there are following simplifying assumptions due to data limitations:
-
 1. Fertility rates vary over time and by education level but are identical for both sexes (the androgynous approximation).
 2. Age-specific education transition probabilities vary over time but not by sex (also an androgynous approximation).
-3. Since no transition data exist beyond age 10, we assume that at ages 0-4, individuals transition from no education to incomplete primary in the next 5-year interval, and at ages 5-9, they transition from incomplete primary to primary (based on India's Compulsory Education Act 2009). (everyone above age 10 will thus have at least primary education)
+3. Since no transition data exist before age 10, we assume that at ages 0-4, individuals transition from no education to incomplete primary in the next 5-year interval, and at ages 5-9, they transition from incomplete primary to primary (based on India's compulsory education act 2009).Everyone above age 10 will thus have at least primary education.
 4. Demographic rates remain stable (time-invariant) before 2020, the earliest observed data point.
 
 ### 6.Exercise 
-##### 6.1 Educatuion compositionfo of selected kin over the life course of Focal 
+##### 6.1 Educatuion composition of selected kin over the life course of Focal 
 E1.1 For a newborn in 2020, how many grandmothers and grandfathers with at least a primary education are they expected to have ? 
 
 E1.2 How does this number change when focal grow older? 
@@ -1143,9 +1210,9 @@ E1.3 what patterns did you observe?  Also, compare this result with the Focal bo
 ```
 
 ##### 6.2 Transitions in education and fertility across time
-E2.1 In which year can a woman born in 2020 expect to have at least half of her children attain at least a secondary level of education? 
+E2.1 In which year can a woman born in 2020 expect that at least half of her children will reach at least a secondary level of education? 
 
-E2.2 What does the shape of the curves tell us about the demographic processes behind  fertility timing and education progression?  
+E2.2 What does the change in the education composition of children over the life course of women born in 2020 tell us about the demographic processes behind fertility timing and education progression?  
 
 ```{r, include=FALSE}
 # Write your code here
@@ -1153,15 +1220,25 @@ E2.2 What does the shape of the curves tell us about the demographic processes b
 ```
 
 ##### 6.3 Education composition over age and time
-E3.1 Compare the educational composition of children in 2020, 2050, and 2080 for a women of age 65. What trends do you observe in the number of primary vs. secondary educated children over time? 
-
-E3.2 At what ages do children with upper secondary & above level of education tend to appear in each year? What does this suggest about educational progression across cohorts?
+E3.1 Compare the educational composition of children in 2020, 2050, and 2080 for a Focal of age 65. What trends do you observe in the number of primary vs. upper secondary & above educated children over time? 
 
 ```{r, include=FALSE}
 # Write your code here
 
 
+
 ```
+
+E3.2 Plot the age and education distribution of the children of a Focal aged 65 in 2020, 2050, and 2080. Then look at how the age distribution of children with upper secondary & above education changes over time. What does this tell us about how educational progression changes across cohorts?
+
+```{r, include=FALSE}
+# Write your code here
+
+
+
+```
+
+
 
 
 
