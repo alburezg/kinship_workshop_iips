@@ -66,7 +66,7 @@ library(DemoKin)
 
 1. Unzip the files and keep them somewhere at hand. 
 
-### 2. Agenda (preliminary)
+### 2. Agenda
 
 ![](agenda.JPG){width=900px}
 
