@@ -827,6 +827,15 @@ Here, we provide an R function`kin_multi_stage_time_variant_2sex`, which combine
 
 This function computes stage-specific kinship networks across both sexes for an average member of a population (focal) under time-varying demographic rates. It estimates the number, age, sex, and stage distribution of Focal's relatives, for each age of Focal's life, and as a function of the year in which Focal is born.
 
+####2.1 Why education?
+
+Q1:Why is it important to study the education levels of both the Focal and their kin in the context of India?
+
+Q2:What input data are required to estimate the number of kin by education using a multistate model in the Demokin package?
+
+Q3:Where can you find the input data needed to incorporate education into a multistate model?
+
+
 ### 3. Data
 
 In this example we use education as an example stage. Indian data ranging from 2020 - 2090 is sourced from the [Wittgenstein Center](https://www.wittgensteincentre.org/en/index.htm). The data is aggregated into 5-year age group and 5-year time interval.
@@ -966,7 +975,7 @@ trans_df <- lapply(seq_along(T_mat_fem_edu), function(i) {
     ) %>%
       mutate(
         transition_prob = as.vector(mat),     
-        age  = 0+ (a - 1) * 5,
+        age  = 5+ (a - 1) * 5,
         year = year_val,
         cohort=year-age,
         from_stage = factor(from_stage, levels = 1:6, labels = edu_labels),
@@ -980,11 +989,12 @@ trans_df <- lapply(seq_along(T_mat_fem_edu), function(i) {
 
 
 # Education transition plot ages 10-15 and 15-20 and 20-25
-ggplot(trans_df%>%filter(age%in%c(10,15,20) & cohort<2065),aes(x = year, y = transition_prob, fill = to_name))+
+ggplot(trans_df%>%filter(age%in%c(15,20,25) & cohort<2065),aes(x = year, y = transition_prob, fill = to_name))+
     geom_area() +
     facet_grid(age ~ from_name) +
     labs(
-      title = "Education transition probabilities for female by age in India",
+      title = "Education transition probabilities from origin to destination education across 
+age groups",
       x = "Year",
       y = "Transition probability",
       fill = "Destination education"
@@ -1194,6 +1204,7 @@ We note that there are following simplifying assumptions due to data limitations
 2. Age-specific education transition probabilities vary over time but not by sex (also an androgynous approximation).
 3. Since no transition data exist before age 10, we assume that at ages 0-4, individuals transition from no education to incomplete primary in the next 5-year interval, and at ages 5-9, they transition from incomplete primary to primary (based on India's compulsory education act 2009).Everyone above age 10 will thus have at least primary education.
 4. Demographic rates remain stable (time-invariant) before 2020, the earliest observed data point.
+
 
 ### 6.Exercise 
 ##### 6.1 Educatuion composition of selected kin over the life course of Focal 
