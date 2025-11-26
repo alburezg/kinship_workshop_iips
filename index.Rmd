@@ -827,7 +827,7 @@ Here, we provide an R function`kin_multi_stage_time_variant_2sex`, which combine
 
 This function computes stage-specific kinship networks across both sexes for an average member of a population (focal) under time-varying demographic rates. It estimates the number, age, sex, and stage distribution of Focal's relatives, for each age of Focal's life, and as a function of the year in which Focal is born.
 
-####2.1 Why education?
+#### 2.1. Why education?
 
 Q1:Why is it important to study the education levels of both the Focal and their kin in the context of India?
 
@@ -1203,7 +1203,7 @@ We note that there are following simplifying assumptions due to data limitations
 1. Fertility rates vary over time and by education level but are identical for both sexes (the androgynous approximation).
 2. Age-specific education transition probabilities vary over time but not by sex (also an androgynous approximation).
 3. Since no transition data exist before age 10, we assume that at ages 0-4, individuals transition from no education to incomplete primary in the next 5-year interval, and at ages 5-9, they transition from incomplete primary to primary (based on India's compulsory education act 2009).Everyone above age 10 will thus have at least primary education.
-4. Demographic rates remain stable (time-invariant) before 2020, the earliest observed data point.
+4. Demographic rates remain stable (time-invariant) before 2020, the earliest observed data point. Therefore every cohort before 2020 experience the same education specific fertility, mortality and transition rates.
 
 
 ### 6.Exercise 
@@ -1218,12 +1218,15 @@ E1.3 what patterns did you observe?  Also, compare this result with the Focal bo
 ```{r, include=FALSE}
 # Write your code here
 
+
 ```
 
 ##### 6.2 Transitions in education and fertility across time
 E2.1 In which year can a woman born in 2020 expect that at least half of her children will reach at least a secondary level of education? 
 
 E2.2 What does the change in the education composition of children over the life course of women born in 2020 tell us about the demographic processes behind fertility timing and education progression?  
+
+E2.2.1 compare the number of children women born in 2020 had in 2050 and in 2060. what difference you observed? now compare the education composition of children in 2050 and 2060.
 
 ```{r, include=FALSE}
 # Write your code here
@@ -1240,7 +1243,7 @@ E3.1 Compare the educational composition of children in 2020, 2050, and 2080 for
 
 ```
 
-E3.2 Plot the age and education distribution of the children of a Focal aged 65 in 2020, 2050, and 2080. Then look at how the age distribution of children with upper secondary & above education changes over time. What does this tell us about how educational progression changes across cohorts?
+E3.2 Plot the age and education distribution of the children and grandchildren of a Focal born in 1950, 2000 and 2050. Then look at how the age distribution of children with upper secondary & above education changes over time. What pattern did you observe?
 
 ```{r, include=FALSE}
 # Write your code here
@@ -1248,7 +1251,6 @@ E3.2 Plot the age and education distribution of the children of a Focal aged 65 
 
 
 ```
-
 
 
 

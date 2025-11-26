@@ -460,7 +460,7 @@ population-level kinship structures</h1>
 <h3 class="subtitle">IIPS, Mumbai, India, November 24-27, 2025</h3>
 <h4 class="author">Instructors: Diego Alburez-Gutierrez &amp; Saroja
 Adhikari</h4>
-<h4 class="date">Updated: 2025-11-25</h4>
+<h4 class="date">Updated: 2025-11-26</h4>
 
 </div>
 
@@ -1371,13 +1371,15 @@ sexes for an average member of a population (focal) under time-varying
 demographic rates. It estimates the number, age, sex, and stage
 distribution of Focal’s relatives, for each age of Focal’s life, and as
 a function of the year in which Focal is born.</p>
-<p>####2.1 Why education?</p>
+<div id="why-education" class="section level4">
+<h4>2.1. Why education?</h4>
 <p>Q1:Why is it important to study the education levels of both the
 Focal and their kin in the context of India?</p>
 <p>Q2:What input data are required to estimate the number of kin by
 education using a multistate model in the Demokin package?</p>
 <p>Q3:Where can you find the input data needed to incorporate education
 into a multistate model?</p>
+</div>
 </div>
 <div id="data" class="section level3">
 <h3>3. Data</h3>
@@ -1597,7 +1599,7 @@ arguments:</p>
 <span id="cb60-22"><a href="#cb60-22" tabindex="-1"></a>                                    <span class="at">output_years =</span> output_year_select <span class="co"># it seems tricky to set up output years when the time interval is not 1</span></span>
 <span id="cb60-23"><a href="#cb60-23" tabindex="-1"></a>                                    <span class="co"># now I select every 10 year for output</span></span>
 <span id="cb60-24"><a href="#cb60-24" tabindex="-1"></a>)</span></code></pre></div>
-<pre><code>## 66.67 sec elapsed</code></pre>
+<pre><code>## 45.53 sec elapsed</code></pre>
 <p>Now we have to recode year and age related variables to show the
 correct years and educational labels:</p>
 <div class="sourceCode" id="cb62"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb62-1"><a href="#cb62-1" tabindex="-1"></a><span class="co"># also need to change the age_focal and year variables accordingly</span></span>
@@ -1763,7 +1765,9 @@ from no education to incomplete primary in the next 5-year interval, and
 at ages 5-9, they transition from incomplete primary to primary (based
 on India’s compulsory education act 2009).Everyone above age 10 will
 thus have at least primary education. 4. Demographic rates remain stable
-(time-invariant) before 2020, the earliest observed data point.</p>
+(time-invariant) before 2020, the earliest observed data point.
+Therefore every cohort before 2020 experience the same education
+specific fertility, mortality and transition rates.</p>
 </div>
 </div>
 <div id="exercise-2" class="section level3">
@@ -1784,6 +1788,9 @@ of her children will reach at least a secondary level of education?</p>
 <p>E2.2 What does the change in the education composition of children
 over the life course of women born in 2020 tell us about the demographic
 processes behind fertility timing and education progression?</p>
+<p>E2.2.1 compare the number of children women born in 2020 had in 2050
+and in 2060. what difference you observed? now compare the education
+composition of children in 2050 and 2060.</p>
 </div>
 <div id="education-composition-over-age-and-time" class="section level5">
 <h5>6.3 Education composition over age and time</h5>
@@ -1791,11 +1798,10 @@ processes behind fertility timing and education progression?</p>
 and 2080 for a Focal of age 65. What trends do you observe in the number
 of primary vs. upper secondary &amp; above educated children over
 time?</p>
-<p>E3.2 Plot the age and education distribution of the children of a
-Focal aged 65 in 2020, 2050, and 2080. Then look at how the age
-distribution of children with upper secondary &amp; above education
-changes over time. What does this tell us about how educational
-progression changes across cohorts?</p>
+<p>E3.2 Plot the age and education distribution of the children and
+grandchildren of a Focal born in 1950, 2000 and 2050. Then look at how
+the age distribution of children with upper secondary &amp; above
+education changes over time. What pattern did you observe?</p>
 </div>
 </div>
 </div>
